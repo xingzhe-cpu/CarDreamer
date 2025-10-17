@@ -1,6 +1,6 @@
 import functools
 
-import gym
+import gymnasium as gym
 import numpy as np
 
 import dreamerv2 as dm2

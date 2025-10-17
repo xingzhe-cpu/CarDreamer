@@ -27,8 +27,11 @@ class Agent(nj.Module):
         self.obs_space = obs_space
         self.act_space = act_space["action"]
         self.step = step
+        #world model
         self.wm = WorldModel(obs_space, act_space, config, name="wm")
+        # 完成任务的policys
         self.task_behavior = getattr(behaviors, config.task_behavior)(self.wm, self.act_space, self.config, name="task_behavior")
+        # 负责探索的policys
         if config.expl_behavior == "None":
             self.expl_behavior = self.task_behavior
         else:
@@ -46,8 +49,11 @@ class Agent(nj.Module):
 
     def policy(self, obs, state, mode="train"):
         self.config.jax.jit and print("Tracing policy function.")
+        #预处理为JAX能处理的格式
         obs = self.preprocess(obs)
+        #上轮迭代获取的state
         (prev_latent, prev_action), task_state, expl_state = state
+        
         embed = self.wm.encoder(obs)
         latent, _ = self.wm.rssm.obs_step(prev_latent, prev_action, embed, obs["is_first"])
         self.expl_behavior.policy(latent, expl_state)

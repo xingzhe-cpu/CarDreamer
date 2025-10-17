@@ -14,6 +14,7 @@ tree_flatten = jax.tree_util.tree_flatten
 
 def Wrapper(agent_cls):
     class Agent(JAXAgent):
+        #Agent类级别的常量，Agent类的所有实例共享这个类常量
         inner = agent_cls
 
         def __init__(self, *args, **kwargs):
@@ -43,6 +44,7 @@ class JAXAgent(embodied.Agent):
         self._once = True
         self._updates = embodied.Counter()
         self._should_metrics = embodied.when.Every(self.config.metrics_every)
+        #在这里变换原本的类函数为JAX函数
         self._transform()
         self.varibs = self._init_varibs(obs_space, act_space)
         self.sync()

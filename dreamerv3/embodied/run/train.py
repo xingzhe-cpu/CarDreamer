@@ -28,6 +28,7 @@ def train(agent, env, replay, logger, args):
 
     nonzeros = set()
 
+    #统计每条episode的length、score、sum_abs_reward和reward_rate
     def per_episode(ep):
         length = len(ep["reward"]) - 1
         score = float(ep["reward"].astype(np.float64).sum())

@@ -11,13 +11,15 @@ authors = [
 ]
 dynamic = ["version", "description"]
 dependencies = [
-    "gym==0.12.5",
+    # 替换 gym 为 gymnasium（见后文“代码兼容”）
+    "gymnasium>=0.28,<1",
+
     "flask==3.0.3",
-    "opencv-python>=4.9,<5.0",
+    "opencv-python==4.8.0.*",        # 对齐 sheeprl
     "carla==0.9.15",
-    "numpy==1.24.3",
+    "numpy>=1.26,<2",                # 放宽到 1.26.x
     "ruamel.yaml==0.18.6",
-    "typing_extensions==4.5.0",
+    "typing_extensions>=4.12,<5",    # 放宽到 4.12+
     "networkx==3.1",
     "Shapely==1.8.4",
     "pyyaml==6.0.1",

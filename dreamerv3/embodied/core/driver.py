@@ -42,23 +42,31 @@ class Driver:
     def _step(self, policy, step, episode):
         assert all(len(x) == len(self._env) for x in self._acts.values())
         acts = {k: v for k, v in self._acts.items() if not k.startswith("log_")}
+        #根据上一轮policy给出的acts步入环境
         obs, info = self._env.step(acts)
+        #类型转换
         obs = {k: convert(v) for k, v in obs.items()}
         info = {k: convert(v) for k, v in info.items()}
+        #校验batch大小
         assert all(len(x) == len(self._env) for x in obs.values()), obs
+        #调用policy获取动作
         acts, self._state = policy(obs, self._state, **self._kwargs)
         acts = {k: convert(v) for k, v in acts.items()}
+        #判断是否最后一个动作，若是则将其mask掉。同时将reset动作设置为True
         if obs["is_last"].any():
             mask = 1 - obs["is_last"]
             acts = {k: v * self._expand(mask, len(v.shape)) for k, v in acts.items()}
         acts["reset"] = obs["is_last"].copy()
+        #保存新的策略输出
         self._acts = acts
+        #将观测和动作合并，形成一个transition
         trns = {**obs, **acts}
+        #对于新进入的episode，清空之前的episode数据
         if obs["is_first"].any():
             for i, first in enumerate(obs["is_first"]):
                 if first:
                     self._eps[i].clear()
-                    self._eps_info[i].clear()
+        #将transition和info数据添加到对应的episode中
         for i in range(len(self._env)):
             trn = {k: v[i] for k, v in trns.items()}
             inf = {k: v[i] for k, v in info.items()}
@@ -66,6 +74,7 @@ class Driver:
             [self._eps_info[i][k].append(v) for k, v in inf.items()]
             [fn(trn, inf, i, **self._kwargs) for fn in self._on_steps]
             step += 1
+        #对于结束的episode，调用on_episodes回调函数，便于统计。
         if obs["is_last"].any():
             for i, done in enumerate(obs["is_last"]):
                 if done:

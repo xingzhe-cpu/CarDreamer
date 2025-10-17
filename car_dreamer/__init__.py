@@ -60,7 +60,7 @@ def create_task(task_name: str, argv=None):
 
     :return: a tuple of the created environment and the configs
     """
-    import gym
+    import gymnasium as gym
 
     config = load_task_configs(task_name)
     config, _ = toolkit.Flags(config).parse_known(argv)
@@ -71,7 +71,8 @@ def _register_envs():
     import os
     from re import sub
 
-    from gym.envs.registration import register
+    from gymnasium.envs.registration import register
+
 
     def toClassName(s):
         return sub(r"(_|-)+", " ", s).title().replace(" ", "")

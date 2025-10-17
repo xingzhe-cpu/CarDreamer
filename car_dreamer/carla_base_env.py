@@ -2,9 +2,9 @@ from abc import abstractmethod
 from typing import Dict, Tuple
 
 import carla
-import gym
+import gymnasium as gym
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 
 from .toolkit import EnvMonitorOpenCV, Observer, WorldManager
 
